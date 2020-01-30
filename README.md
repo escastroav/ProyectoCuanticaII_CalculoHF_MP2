@@ -101,11 +101,29 @@ Este es el algoritmo principal para hallar la energía del sistema, la cual se p
 
 Diagrama...
 
-Asignando un P inicial arbitrario (que en este caso se asignó una matriz nula) Se realiza el cálculo de la matriz de Fock, para posteriormente diagonalizar F' y obtener los autovalores de energía E y los autovectores C'. Realizando las sustituciones adecuadas se recalcula la matriz P con los coeficientes obtenidos en C. Finalmente se establece un criterio de convergencia en el cual se evalúa la condición
+Asignando un P inicial arbitrario (que en este caso se asignó una matriz nula) Se realiza el cálculo de la matriz de Fock, para posteriormente diagonalizar F' y obtener los autovalores de energía E y los autovectores C'. Realizando las sustituciones adecuadas se recalcula la matriz P con los coeficientes obtenidos en C. Finalmente se establece un criterio de convergencia, que evalúa entre un P_old de la iteración anterior y el P actual la siguiente condición
 
-P_old - P < epsilon >
+P_old - P < epsilon 
+>
 
-Donde epsilon es un valor pequeño y se define en el computador, de acuerdo a la precisión del mismo.  Una vez se cumpla ese criterio de convergencia, se habrán obtenido los autovalores reales de energía en la matriz E.
+Donde epsilon es un valor pequeño y se define en el computador, de acuerdo a la precisión del mismo.  Una vez se cumpla ese criterio de convergencia, se habrán obtenido los autovalores reales de energía de la matriz E.
+
+### Perturbación Moller-Plesset
+
+Luego de realizar el cálculo Hatree-Fock, es convieniente utilizar una corrección de esta energía, usando la teoría de perturbaciones independiente del tiempo Moller-Plesset. Esta consiste en tomar el potencial electrón-electrón V_hf como una perturbación, tal que se calcula a segundo orden
+
+E MP2 = 1/4 SUM....
+
+Cabe resaltar que este cálculo requiere reorganizar los valores encontrados y no es en sí un método iterativo, lo cual lo hace relativamente sencillo de implementar y mejora sustancialmente el cálculo de la energía.
+## Estructura del código
+
+Para llevar a cabo este calculo se implementó el método en una script escrita en C++ (MP2.cpp), la cual utiliza la librería Eigen 3, esencial para realizar cálculos matriciales [2]. Observando las funciones y métodos escritos en la script, es posible identificar las siguientes etapas.
+
+En primer lugar se utilizan las funciones S_int y T_int para calcular las integrales necesarias en cada elemento matricial del Hamiltoniano nuclear Hcore y la matriz de superposición S, necesarias para calcular la matriz G y F. La función Intgrl realiza la integración y guarda los valores a sus matrices correspondientes por medio de la función Colect, así como los elementos de G que deben ser almacenados en un arreglo de 4 dimensiones, ya que según su ecuación requiere de varias integrales. Esta función a su vez permite realizar el cálculo de S1/2, la cual se denomina matriz X, y será necesaria para el método SCF.Este método utiliza los valores calculados en H y S para ejecutar el algoritmo de campo autoconsistente, tal como se explica en la sección anterior. Finalmente se procede a realizar el cálculo Moller-Plesset a las energías obtenidas por Hartree-Fock, utilizando un arreglo de 4 dimensiones para reorganizar los valores de energía obtenidos. 
+
+Finalmente se varía la distancia R electrón-nucleo con el fin de observar el comportamiento de la energía en funcion de esta distancia, utilizando los métodos previamente mencionados. En las figuras 1 y 2 se puede observar la energía para H2 y HeH+ respectivamente.
+
+
 
 
 
